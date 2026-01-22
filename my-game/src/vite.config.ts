@@ -7,6 +7,10 @@ export default defineConfig({
     open: true,
     hmr: { overlay: true }
   },
+  base: '',
+  build: {
+    assetsDir: 'assets'
+  },
   assetsInclude: ['**/*.m4a']
 });
 ``
