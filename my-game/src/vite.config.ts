@@ -6,6 +6,7 @@ export default defineConfig({
     port: 5173,
     open: true,
     hmr: { overlay: true }
-  }
+  },
+  assetsInclude: ['**/*.m4a']
 });
 ``
