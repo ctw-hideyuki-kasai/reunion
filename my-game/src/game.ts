@@ -19,6 +19,14 @@ export function createGame(): Phaser.Game {
       width: SCREEN.WIDTH,
       height: SCREEN.HEIGHT,
     },
+    input: {
+      mouse: {
+        target: 'app'
+      },
+      touch: {
+        target: 'app'
+      }
+    },
     physics: {
       default: 'arcade',
       arcade: {
