@@ -26,9 +26,18 @@ export class TitleScene extends Phaser.Scene {
           .setOrigin(0.5)
           .setStrokeStyle(4, 0x006600);
 
-    btn.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
-      this.scene.start(SCENES.GAME);
-    });
+    btn.setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => {
+        console.log('Button clicked!');
+        this.scene.start(SCENES.GAME);
+      })
+      .on('pointerup', () => {
+        console.log('Button released!');
+      })
+      .on('click', () => {
+        console.log('Button clicked via click event!');
+        this.scene.start(SCENES.GAME);
+      });
 
     // === ランキング TOP10（同点は同順位、次は下がる） ===
     const listWithRank = getRankingsWithRanks(); // [{ rank, entry }, ...]
