@@ -27,6 +27,10 @@ export function createGame(): Phaser.Game {
         target: 'app'
       }
     },
+    audio: {
+      // Web Audio APIを使用
+      disableWebAudio: false
+    },
     physics: {
       default: 'arcade',
       arcade: {

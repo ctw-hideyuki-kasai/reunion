@@ -135,8 +135,20 @@ export class GameScene extends Phaser.Scene {
         const existing = this.sound.get("bgm") as Phaser.Sound.BaseSound | null;
         if (existing?.isPlaying) return;
 
+        console.log('Attempting to play BGM...');
         this.bgm = this.sound.add("bgm", { loop: true, volume: BGM_VOLUME });
-        this.bgm.play();
+        
+        this.bgm.on('play', () => {
+          console.log('BGM started playing');
+        });
+        
+        this.bgm.on('failed', () => {
+          console.error('BGM failed to play');
+        });
+        
+        const playResult = this.bgm.play();
+        console.log('BGM play result:', playResult);
+        
         //< ゲーム開始
         this.gameStart = true;
       });

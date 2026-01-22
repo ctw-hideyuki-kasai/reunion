@@ -16,7 +16,14 @@ export class BootScene extends Phaser.Scene {
       ResourceManager.image(this, GAME.TITLE_TRY as string);
     }
     // BGM
+    console.log('Loading BGM...');
     this.load.audio("bgm", ["./sounds/BGM/touchou_BGM.m4a"]);
+    this.load.on('filecomplete', (key: string) => {
+      console.log(`File loaded: ${key}`);
+    });
+    this.load.on('loaderror', (key: string) => {
+      console.error(`Failed to load: ${key}`);
+    });
     // SE
     this.load.audio("gameover", "./sounds/SE/gameover.mp3");
     this.load.audio("success", "./sounds/SE/success.mp3");
