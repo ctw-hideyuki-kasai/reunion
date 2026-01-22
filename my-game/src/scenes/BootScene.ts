@@ -9,8 +9,12 @@ export class BootScene extends Phaser.Scene {
   preload() {
     this.cameras.main.setBackgroundColor('#000');
     // 重要アセットだけ事前ロード（なければ警告）
-    ResourceManager.image(this, GAME.TITLE_BG as string);
-    ResourceManager.image(this, GAME.TITLE_TRY as string);
+    if (GAME.TITLE_BG) {
+      ResourceManager.image(this, GAME.TITLE_BG as string);
+    }
+    if (GAME.TITLE_TRY) {
+      ResourceManager.image(this, GAME.TITLE_TRY as string);
+    }
     // BGM
     this.load.audio("bgm", ["./sounds/BGM/touchou_BGM.m4a"]);
     // SE
@@ -32,7 +36,7 @@ export class BootScene extends Phaser.Scene {
     //< item
     for (let d = 1; d <= 22; d++) {
       const id3 = String(d).padStart(3, '0');
-      ResourceManager.image(this, `./images/item/item${id3}.png`);
+      this.load.image(`item-${id3}`, `./images/item/item${id3}.png`);
     }
   }
 

@@ -10,7 +10,7 @@ export class TitleScene extends Phaser.Scene {
     console.log('TitleScene create() called');
     
     // === 背景（未配置時は矩形フォールバック） ===
-    if (this.textures.exists(GAME.TITLE_BG)) {
+    if (GAME.TITLE_BG && this.textures.exists(GAME.TITLE_BG)) {
       const bg = this.add.image(SCREEN.WIDTH / 2, SCREEN.HEIGHT / 2, GAME.TITLE_BG).setOrigin(0.5);
       bg.setDisplaySize(SCREEN.WIDTH, SCREEN.HEIGHT);
     } else {
@@ -21,7 +21,7 @@ export class TitleScene extends Phaser.Scene {
     }
 
     // === TRY ボタン（未配置時は矩形ボタン） ===
-    const btn = this.textures.exists(GAME.TITLE_TRY)
+    const btn = GAME.TITLE_TRY && this.textures.exists(GAME.TITLE_TRY)
       ? this.add.image(SCREEN.WIDTH / 2, SCREEN.HEIGHT * 0.8, GAME.TITLE_TRY).setOrigin(0.5)
       : this.add
           .rectangle(SCREEN.WIDTH / 2, SCREEN.HEIGHT * 0.8, 260, 96, 0x00aa00)

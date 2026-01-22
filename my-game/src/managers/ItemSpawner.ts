@@ -48,7 +48,7 @@ export class ItemSpawner {
 
   private itemTex(row: ItemCSV) {
     const id3 = String(row.Id).padStart(3, '0');
-    return `/images/item/item${id3}.png`;
+    return `item-${id3}`;
   }
 
   //< ランダムでレーン(縦軸)を選ぶ

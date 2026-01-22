@@ -27,8 +27,8 @@ export const ITEM = {
 // ゲーム制御
 export const GAME = {
   LANE_COUNT: 4,
-  TITLE_BG: './images/ui/bg.webp',
-  TITLE_TRY: './images/ui/try.png',
+  TITLE_BG: null, // ファイルが存在しないためnullに設定
+  TITLE_TRY: null, // ファイルが存在しないためnullに設定
   // 背景（例：存在しなくても続行、警告は出す）
   BG_TILE_KEYS: [
     './images/backGround/BG_Build_Loop0.png', // Area=0 地面
