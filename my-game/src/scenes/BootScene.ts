@@ -17,7 +17,7 @@ export class BootScene extends Phaser.Scene {
     }
     // BGM
     console.log('Loading BGM...');
-    this.load.audio("bgm", ["./sounds/BGM/touchou_BGM.m4a"]);
+    this.load.audio("bgm", ["./sounds/BGM/touchou_BGM.mp3"]);
     this.load.on('filecomplete', (key: string) => {
       console.log(`File loaded: ${key}`);
     });
