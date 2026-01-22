@@ -1,0 +1,57 @@
+[
+  {
+    "name": "AAA",
+    "score": 1000,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "BBB",
+    "score": 900,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "CCC",
+    "score": 800,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "DDD",
+    "score": 700,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "EEE",
+    "score": 600,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "FFF",
+    "score": 500,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "GGG",
+    "score": 400,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "HHH",
+    "score": 300,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "III",
+    "score": 200,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "JJJ",
+    "score": 100,
+    "scoreAt": 1767193200000
+  },
+  {
+    "name": "KKK",
+    "score": 0,
+    "scoreAt": 1767193200000
+  }
+]
