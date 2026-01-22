@@ -12,27 +12,27 @@ export class BootScene extends Phaser.Scene {
     ResourceManager.image(this, GAME.TITLE_BG as string);
     ResourceManager.image(this, GAME.TITLE_TRY as string);
     // BGM
-    this.load.audio("bgm", ["/sounds/BGM/touchou_BGM.wav"]);
+    this.load.audio("bgm", ["./sounds/BGM/touchou_BGM.m4a"]);
     // SE
-    this.load.audio("gameover", "/sounds/SE/gameover.mp3");
-    this.load.audio("success", "/sounds/SE/success.mp3");
-    this.load.audio("title", "/sounds/SE/title.mp3");
+    this.load.audio("gameover", "./sounds/SE/gameover.mp3");
+    this.load.audio("success", "./sounds/SE/success.mp3");
+    this.load.audio("title", "./sounds/SE/title.mp3");
     // UI
     ResourceManager.image(this, GAME.UI.HP);
     for (let d = 0; d <= 9; d++) {
-      this.load.image(`/images/ui/score/Score_Number${d}.png`, `/images/ui/score/Score_Number${d}.png`);
-      this.load.image(`/images/ui/time/Time_Number${d}.png`, `/images/ui/time/Time_Number${d}.png`);
+      this.load.image(`score-num-${d}`, `./images/ui/score/Score_Number${d}.png`);
+      this.load.image(`time-num-${d}`, `./images/ui/time/Time_Number${d}.png`);
     }
     this.load.image(GAME.UI.TIME_COLON, GAME.UI.TIME_COLON);
     // Player
-    ResourceManager.image(this, `/images/player/Ladder01.png`);
-    ResourceManager.image(this, `/images/player/Ladder02.png`);
+    ResourceManager.image(this, "./images/player/Ladder01.png");
+    ResourceManager.image(this, "./images/player/Ladder02.png");
     // 背景
     GAME.BG_TILE_KEYS.forEach(k => ResourceManager.image(this, k));
     //< item
     for (let d = 1; d <= 22; d++) {
       const id3 = String(d).padStart(3, '0');
-      ResourceManager.image(this, `/images/item/item${id3}.png`);
+      ResourceManager.image(this, `./images/item/item${id3}.png`);
     }
   }
 
