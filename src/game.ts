@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser';
-import { SCREEN, SCENES } from './constants';
+import { SCREEN } from './constants';
 import { BootScene } from './scenes/BootScene';
 import { TitleScene } from './scenes/TitleScene';
 import { GameScene } from './scenes/GameScene';
@@ -22,7 +22,7 @@ export function createGame(): Phaser.Game {
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { y: 0 }, debug: false,
+        gravity: { x: 0, y: 0 }, debug: false,
       }
     },
     scene: [BootScene, TitleScene, GameScene, ResultScene],

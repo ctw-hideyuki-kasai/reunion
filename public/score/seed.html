@@ -1,0 +1,141 @@
+
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seed Rankings | localStorage Initializer</title>
+  <style>
+    :root { --fg:#111; --bg:#fff; --ok:#0a7; --warn:#c70; --err:#c22; --muted:#666; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans JP", sans-serif;}
+    main{max-width:840px;margin:32px auto;padding:24px}
+    h1{font-size:20px;margin:0 0 12px}
+    .box{border:1px solid #ddd;border-radius:8px;padding:16px;margin:12px 0}
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .msg{padding:12px 14px;border-left:6px solid var(--muted);background:#f9f9f9;border-radius:6px}
+    .msg.ok{border-left-color:var(--ok);}
+    .msg.warn{border-left-color:var(--warn);} 
+    .msg.err{border-left-color:var(--err);background:#fff5f5}
+    code,kbd{background:#f2f2f2;border-radius:4px;padding:2px 6px;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+    button{appearance:none;border:1px solid #bbb;border-radius:8px;padding:8px 12px;background:#fff;cursor:pointer}
+    button.primary{border-color:#0a7;color:#0a7}
+    table{border-collapse:collapse;width:100%;}
+    th,td{border:1px solid #eee;padding:6px 8px;text-align:left}
+    th{background:#fafafa}
+    footer{margin-top:32px;color:#666;font-size:12px}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ランキング初期化（localStorage /rankings）</h1>
+    <div class="box">
+      <div id="status" class="msg">読み込み中…</div>
+      <div class="row" style="margin-top:8px">
+        <button id="btnOpen" class="primary" hidden>ゲームを開く</button>
+        <button id="btnForce" hidden>強制上書き（force=1）</button>
+        <button id="btnClear" hidden>ランキングを削除</button>
+        <button id="btnView" hidden>現在の値を表示</button>
+      </div>
+    </div>
+
+    <div id="output" class="box" hidden>
+      <div style="font-weight:600;margin-bottom:8px">プレビュー</div>
+      <div id="preview"></div>
+    </div>
+
+    <footer>
+      <div>同一オリジンの <code>localStorage['rankings']</code> に <code>rankings.seed.json</code> を投入します。</div>
+      <div>URL パラメータ：<code>?force=1</code>（既存を無視して上書き）、<code>?url=/score/rankings.seed.json</code>（読み込み先の上書き）</div>
+    </footer>
+  </main>
+
+<script>
+(async () => {
+  const KEY = 'rankings';
+  const $ = (sel)=>document.querySelector(sel);
+  const status = $('#status');
+  const output = $('#output');
+  const preview = $('#preview');
+  const btnOpen = $('#btnOpen');
+  const btnForce = $('#btnForce');
+  const btnClear = $('#btnClear');
+  const btnView = $('#btnView');
+
+  const usp = new URLSearchParams(location.search);
+  const force = usp.has('force') && usp.get('force') !== '0';
+  const seedURL = usp.get('url') || '/score/rankings.seed.json';
+  const gameURL = usp.get('to') || '/';
+
+  function setMsg(html, cls=''){
+    status.className = 'msg ' + cls;
+    status.innerHTML = html;
+  }
+
+  function safeParse(str){
+    try { return JSON.parse(str); } catch(e){ return null; }
+  }
+
+  function validate(arr){
+    if (!Array.isArray(arr)) throw new Error('JSON は配列ではありません');
+    const clamp = (n,min,max)=>Math.min(max,Math.max(min,n));
+    const out = [];
+    for (const e of arr){
+      if (typeof e !== 'object' || e===null) throw new Error('要素がオブジェクトではありません');
+      const name = String(e.name ?? '').trim();
+      const score = Number(e.score);
+      const scoreAt = Number(e.scoreAt);
+      if (!/^([A-Za-z0-9]{1,10})$/.test(name)) throw new Error('name が不正: ' + name);
+      if (!Number.isFinite(score)) throw new Error('score が数値ではありません');
+      if (!Number.isFinite(scoreAt)) throw new Error('scoreAt が数値ではありません');
+      out.push({ name, score: clamp(Math.trunc(score), 0, 99_999_999), scoreAt: Math.trunc(scoreAt) });
+    }
+    return out;
+  }
+
+  async function loadSeed(url){
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    return validate(json);
+  }
+
+  function showPreview(list, title='現在のランキング'){
+    output.hidden = false;
+    const rows = list.map((e,i)=>`<tr><td>${i+1}</td><td>${e.name}</td><td style="text-align:right">${e.score.toLocaleString()}</td><td>${new Date(e.scoreAt).toLocaleString()}</td></tr>`).join('');
+    preview.innerHTML = `<div style="margin-bottom:6px">${title}（${list.length}件）</div>`+
+      `<table><thead><tr><th>#</th><th>Name</th><th>Score</th><th>scoreAt</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  // Buttons
+  btnOpen.onclick = ()=>location.href = gameURL;
+  btnForce.onclick = ()=>location.href = location.pathname + '?force=1' + (seedURL?('&url='+encodeURIComponent(seedURL)):'') + (gameURL?('&to='+encodeURIComponent(gameURL)):'');
+  btnClear.onclick = ()=>{ localStorage.removeItem(KEY); setMsg('🗑️ rankings を削除しました。再読込で seed できます。','warn'); btnClear.hidden=true; };
+  btnView.onclick = ()=>{
+    const arr = safeParse(localStorage.getItem(KEY)) || [];
+    showPreview(arr,'localStorage[\'rankings\']');
+  };
+
+  try {
+    const exists = !!localStorage.getItem(KEY);
+    if (exists && !force){
+      setMsg('⚠️ localStorage["rankings"] は既に存在します。<br>強制上書きするには <code>?force=1</code> を付けて再アクセスしてください。','warn');
+      btnForce.hidden = false; btnView.hidden=false; btnClear.hidden=false; btnOpen.hidden=false;
+      showPreview(safeParse(localStorage.getItem(KEY))||[], 'localStorage[\'rankings\']');
+      return;
+    }
+
+    const list = await loadSeed(seedURL);
+    localStorage.setItem(KEY, JSON.stringify(list));
+
+    setMsg(`✅ 初期化が完了しました（${list.length}件）。ゲームを開始できます。`,'ok');
+    btnOpen.hidden=false; btnView.hidden=false; btnClear.hidden=false;
+    showPreview(list, '投入したランキング（プレビュー）');
+  } catch (e){
+    console.error(e);
+    setMsg('❌ 失敗：' + (e && e.message ? e.message : e), 'err');
+    btnView.hidden=false;
+  }
+})();
+</script>
+</body>
+</html>
