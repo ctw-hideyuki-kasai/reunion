@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser';
-import { SCREEN } from './constants';
+import { SCREEN, SCENES } from './constants';
 import { BootScene } from './scenes/BootScene';
 import { TitleScene } from './scenes/TitleScene';
 import { GameScene } from './scenes/GameScene';
@@ -19,22 +19,10 @@ export function createGame(): Phaser.Game {
       width: SCREEN.WIDTH,
       height: SCREEN.HEIGHT,
     },
-    input: {
-      mouse: {
-        target: 'app'
-      },
-      touch: {
-        target: 'app'
-      }
-    },
-    audio: {
-      // Web Audio APIを使用
-      disableWebAudio: false
-    },
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { x: 0, y: 0 }, debug: false,
+        gravity: { y: 0 }, debug: false,
       }
     },
     scene: [BootScene, TitleScene, GameScene, ResultScene],

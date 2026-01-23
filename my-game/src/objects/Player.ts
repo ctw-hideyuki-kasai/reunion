@@ -22,6 +22,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, GAME.PLAYER.SPRITE_01);
     this.setOrigin(0.5, 0.5);
+    this.setDepth(1);
   }
 
   //< 初期化
@@ -76,8 +77,8 @@ export class Player extends Phaser.GameObjects.Sprite {
   preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
     //< 入力が入ってない時は停止
-    if(this.allowScroll == false)
-    { //< チョン押しした時は更新したい
+    if(this.allowScroll == false) {
+      //< チョン押しした時は更新したい
       if(this.beforeAllowScroll) this.animTimer = (this.animTimer > PLAYR_ANIM_MAX * 0.5 ? 0 : PLAYR_ANIM_MAX);
       this.beforeAllowScroll = this.allowScroll;
       return;

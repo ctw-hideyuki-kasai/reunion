@@ -27,33 +27,35 @@ export const ITEM = {
 // ゲーム制御
 export const GAME = {
   LANE_COUNT: 4,
-  TITLE_BG: null, // ファイルが存在しないためnullに設定
-  TITLE_TRY: null, // ファイルが存在しないためnullに設定
+  TITLE_BG: '/images/ui/bg.webp',
+  TITLE_TRY: '/images/ui/try.png',
   // 背景（例：存在しなくても続行、警告は出す）
   BG_TILE_KEYS: [
-    './images/backGround/BG_Build_Loop0.png', // Area=0 地面
-    './images/backGround/BG_Build_Loop1.png', // Area=1 空
-    './images/backGround/BG_Build_Loop2.png', // Area=2 宇宙
-    './images/backGround/BG_Build_Loop3.png', // Area=3 ゴール
+    '/images/backGround/BG_Title.png',        // スタート
+    '/images/backGround/BG_Build_Loop0.png',  // Area=0 地面
+    '/images/backGround/BG_Build_Loop1.png',  // Area=1 空
+    '/images/backGround/BG_Build_Loop2.png',  // Area=2 宇宙
+    '/images/backGround/BG_Build_Loop3.png',  // ゴール
   ],
   // UI画像
   UI: {
-    HP: './images/ui/HP.png',
-    SCORE_NUMBERS_DIR: './images/ui/score/', // Score_Number0.png ... 9
-    TIME_NUMBERS_DIR: './images/ui/time/',   // Time_Number0.png ... 9
-    TIME_COLON: './images/ui/time/Time_Numbercolon.png',
+    HP: '/images/ui/HP.png',
+    SCORE_NUMBERS_DIR: '/images/ui/score/', // Score_Number0.png ... 9
+    TIME_NUMBERS_DIR: '/images/ui/time/',   // Time_Number0.png ... 9
+    TIME_COLON: '/images/ui/time/Time_Numbercolon.png',
     MARGIN_TOP: 24,
     MARGIN_LEFT: 24,
     MARGIN_RIGHT: 24,
     ICON_PAD: 12,
+    UI_DEPTH:1000,
   },
   PLAYER: {
-    SPRITE_01: './images/player/Ladder01.png',
-    SPRITE_02: './images/player/Ladder02.png',
+    SPRITE_01: '/images/player/Ladder01.png',
+    SPRITE_02: '/images/player/Ladder02.png',
   },
   DATA: {
-    PLAYER: './datas/player.csv',
-    ITEM: './datas/item.csv',
+    PLAYER: '/datas/player.csv',
+    ITEM: '/datas/item.csv',
   },
 };
 

@@ -26,7 +26,6 @@ export class GameScene extends Phaser.Scene {
 
   // 進行管理
   gameSec = 0;        // 常にカウント
-  elapsedMoveSec = 0; // ↑押下時のみカウント
   startTimeSec = 300;
   gameStart = false;
   gameEnd = false;
@@ -60,7 +59,6 @@ export class GameScene extends Phaser.Scene {
   private resetRunState() {
     this.score = 0;
     this.gameSec = 0;
-    this.elapsedMoveSec = 0;
     this.gameStart = false;
     this.gameEnd = false;
     this.cleared = false;
@@ -83,12 +81,14 @@ export class GameScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor('#001018');
 
+    // 設定ロード
+    this.loadConfig().then(ok => {
+      if (ok) this.afterConfigReady();
+      else errorOverlay.error('CSVの読み込みに失敗しました（タイトルへ戻ってください）');
+    });
+
     // title BGM再生
     this.startBgm();
-
-    // 背景
-    this.bg = new BackgroundManager(this);
-    this.bg.create();
 
     // 入力
     this.keyLeft = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -113,12 +113,6 @@ export class GameScene extends Phaser.Scene {
 
     // スポーナ
     this.spawner = new ItemSpawner(this);
-
-    // 設定ロード
-    this.loadConfig().then(ok => {
-      if (ok) this.afterConfigReady();
-      else errorOverlay.error('CSVの読み込みに失敗しました（タイトルへ戻ってください）');
-    });
   }
   
   private startBgm() {
@@ -135,20 +129,8 @@ export class GameScene extends Phaser.Scene {
         const existing = this.sound.get("bgm") as Phaser.Sound.BaseSound | null;
         if (existing?.isPlaying) return;
 
-        console.log('Attempting to play BGM...');
         this.bgm = this.sound.add("bgm", { loop: true, volume: BGM_VOLUME });
-        
-        this.bgm.on('play', () => {
-          console.log('BGM started playing');
-        });
-        
-        this.bgm.on('failed', () => {
-          console.error('BGM failed to play');
-        });
-        
-        const playResult = this.bgm.play();
-        console.log('BGM play result:', playResult);
-        
+        this.bgm.play();
         //< ゲーム開始
         this.gameStart = true;
       });
@@ -157,7 +139,10 @@ export class GameScene extends Phaser.Scene {
     se.play();
   }
 
-  
+  private playSe(name:string) {
+    this.sound.play(name, { volume: 1.0, detune: Phaser.Math.Between(-50, 50) });
+  }
+
   private async loadConfig(): Promise<boolean> {
     try {
       // player.csv
@@ -177,13 +162,12 @@ export class GameScene extends Phaser.Scene {
         OnHitStunSeconds: num('OnHitStunSeconds', false)!,
         OnHitInvincibleSeconds: num('OnHitInvincibleSeconds', false)!,
         SecPerScreen: num('SecPerScreen', false)!,
-        Area1Sec: num('Area1Sec', false)!, Area2Sec: num('Area2Sec', false)!,
-        Area3Sec: num('Area3Sec', false)!, goalSec: num('goalSec', false)!,
+        Area1Sec: num('Area1Sec', false)!, Area2Sec: num('Area2Sec', false)!, goalSec: num('goalSec', false)!,
       };
 
       // バリデーション
-      if (!(0 < cfg.Area1Sec && cfg.Area1Sec < cfg.Area2Sec && cfg.Area2Sec < cfg.Area3Sec && cfg.Area3Sec < cfg.goalSec && cfg.goalSec <= cfg.StartTimeSeconds)) {
-        errorOverlay.warn('player.csv 時間帯の関係が不正: 0 < Area1Sec < Area2Sec < Area3Sec < goalSec ≤ StartTimeSeconds');
+      if (!(0 < cfg.Area1Sec && cfg.Area1Sec < cfg.Area2Sec && cfg.Area2Sec < cfg.goalSec && cfg.goalSec <= cfg.StartTimeSeconds)) {
+        errorOverlay.warn('player.csv 時間帯の関係が不正: 0 < Area1Sec < Area2Sec < goalSec ≤ StartTimeSeconds');
       }
 
       this.cfg = cfg;
@@ -249,12 +233,15 @@ export class GameScene extends Phaser.Scene {
     this.spawner.setCenterY((0 + (SCREEN.HEIGHT * (1 - 0.2))) / 2);
     this.spawner.setPool(this.items);
     this.spawner.scheduleNext();
+    
+    // 背景
+    this.bg = new BackgroundManager(this, this.cfg.Area1Sec,this.cfg.Area2Sec,this.cfg.goalSec);
+    this.bg.create();
   }
 
   private handleInput() {
     //< GameEnd時は無視する
-    if(this.gameEnd == true)
-    {
+    if(this.gameEnd == true) {
       this.allowScroll = this.upReset = false;
       this.wantLeft = this.wantRight = this.wantUp = false;
       return;
@@ -297,15 +284,6 @@ export class GameScene extends Phaser.Scene {
     this.wantLeft = this.wantRight = false;
   }
 
-  private currentAreaByTime(): 0 | 1 | 2 | 3 {
-    const t = this.elapsedMoveSec;
-    if (t < this.cfg.Area1Sec) return 0;
-    if (t < this.cfg.Area2Sec) return 1;
-    if (t < this.cfg.Area3Sec) return 2;
-    if (t < this.cfg.goalSec) return 3;
-    return 3;
-  }
-
   update(time: number, deltaMs: number) {
     if (!this.cfg) return;
 
@@ -338,7 +316,6 @@ export class GameScene extends Phaser.Scene {
 
     //< ↑押下中のみスクロール
     if (this.allowScroll) {
-      this.elapsedMoveSec += dSec;
       // キャラの画像サイズに比例して速度を上げられるようにする
       const pxPerSec = this.player.displayHeight;
       const dy = pxPerSec * dSec;
@@ -346,14 +323,10 @@ export class GameScene extends Phaser.Scene {
       this.bg.scroll(dy);
       // シーン内の敵/アイテムも下へ"迫る"感（背景演出で対応）
     }
-
-    // エリア
-    const area = this.currentAreaByTime();
-    this.bg.setArea(area);
-
+    
     // スポーン
     const pxPerSec = (SCREEN.HEIGHT / this.cfg.SecPerScreen);
-    if(this.gameEnd == false) this.spawner.update(this.time.now, pxPerSec, area);
+    if(this.gameEnd == false) this.spawner.update(this.time.now, pxPerSec, this.bg.getCurrentArea());
 
     // アイテム移動・画面外除去
     this.children.each((g: any) => {
@@ -413,8 +386,8 @@ export class GameScene extends Phaser.Scene {
       this.hud.setHP(this.player.hp);
       this.hud.setScore(this.score);
     }
-    else if(hits.length && this.gameEnd)
-    { //< GameEnd中は効果なしで消滅 
+    else if(hits.length && this.gameEnd) {
+      //< GameEnd中は効果なしで消滅 
       hits.forEach(h => {
         h.destroy();
       });
@@ -425,7 +398,7 @@ export class GameScene extends Phaser.Scene {
     this.hud.setTime(remaining);
 
     // クリア or HP 0（多重遷移ガードを追加）
-    if (!this.cleared && !this.gameEnd && this.elapsedMoveSec >= this.cfg.goalSec) {
+    if (!this.cleared && !this.gameEnd && this.bg.getClearFlag()) {
       this.gameEnd = true;
       this.cleared = true;
       // クリアボーナス：残り秒×100（確定時に一度だけ）
@@ -435,7 +408,6 @@ export class GameScene extends Phaser.Scene {
       }
       
       //< BGM止めて、クリアSE再生し、Resultへ
-      console.log("clear");
       this.bgm?.stop();
       const se = this.sound.add("success", { volume: SE_VOLUME, detune: Phaser.Math.Between(-50, 50) });
       se.once('complete', () => {
@@ -451,7 +423,6 @@ export class GameScene extends Phaser.Scene {
 
     if (this.player.hp <= 0 && !this.gameEnd) {
       //< BGM止めて、クリアSE再生し、Resultへ
-      console.log("gameover");
       this.gameEnd = true;
       this.bgm?.stop();
       const se = this.sound.add("gameover", { volume: SE_VOLUME, detune: Phaser.Math.Between(-50, 50) });

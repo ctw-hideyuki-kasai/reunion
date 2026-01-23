@@ -1,6 +1,6 @@
 
 import Phaser from 'phaser';
-import { SCREEN, BOTTOM_UI_RATIO } from '../constants';
+import { GAME, SCREEN, BOTTOM_UI_RATIO } from '../constants';
 
 /**
  * 画面下20%を3分割（左/上/右）。同時押しは禁止（GameScene側で制御）。
@@ -25,7 +25,7 @@ export class VirtualPad {
     const w = SCREEN.WIDTH / 3;
 
     const makeZone = (x: number) => {
-      const z = this.scene.add.zone(x, top + h / 2, w, h).setOrigin(0, 0.5);
+      const z = this.scene.add.zone(x, top + h / 2, w, h).setOrigin(0, 0.5).setDepth(GAME.UI.UI_DEPTH);
       z.setInteractive({ useHandCursor: true });
       return z;
     };

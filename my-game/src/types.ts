@@ -9,7 +9,6 @@ export type PlayerCSV = {
   SecPerScreen: number;
   Area1Sec: number;
   Area2Sec: number;
-  Area3Sec: number;
   goalSec: number;
 };
 

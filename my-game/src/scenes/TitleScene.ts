@@ -7,10 +7,8 @@ export class TitleScene extends Phaser.Scene {
   constructor() { super(SCENES.TITLE); }
 
   create() {
-    console.log('TitleScene create() called');
-    
     // === 背景（未配置時は矩形フォールバック） ===
-    if (GAME.TITLE_BG && this.textures.exists(GAME.TITLE_BG)) {
+    if (this.textures.exists(GAME.TITLE_BG)) {
       const bg = this.add.image(SCREEN.WIDTH / 2, SCREEN.HEIGHT / 2, GAME.TITLE_BG).setOrigin(0.5);
       bg.setDisplaySize(SCREEN.WIDTH, SCREEN.HEIGHT);
     } else {
@@ -21,29 +19,16 @@ export class TitleScene extends Phaser.Scene {
     }
 
     // === TRY ボタン（未配置時は矩形ボタン） ===
-    const btn = GAME.TITLE_TRY && this.textures.exists(GAME.TITLE_TRY)
+    const btn = this.textures.exists(GAME.TITLE_TRY)
       ? this.add.image(SCREEN.WIDTH / 2, SCREEN.HEIGHT * 0.8, GAME.TITLE_TRY).setOrigin(0.5)
       : this.add
           .rectangle(SCREEN.WIDTH / 2, SCREEN.HEIGHT * 0.8, 260, 96, 0x00aa00)
           .setOrigin(0.5)
           .setStrokeStyle(4, 0x006600);
 
-    console.log('Button created, setting interactive...');
-    
-    btn.setInteractive({ useHandCursor: true })
-      .on('pointerdown', (pointer: any) => {
-        console.log('Button clicked! pointer:', pointer);
-        this.scene.start(SCENES.GAME);
-      })
-      .on('pointerup', (pointer: any) => {
-        console.log('Button released! pointer:', pointer);
-      })
-      .on('click', (pointer: any) => {
-        console.log('Button clicked via click event! pointer:', pointer);
-        this.scene.start(SCENES.GAME);
-      });
-
-    console.log('Button interactive set up complete');
+    btn.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+      this.scene.start(SCENES.GAME);
+    });
 
     // === ランキング TOP10（同点は同順位、次は下がる） ===
     const listWithRank = getRankingsWithRanks(); // [{ rank, entry }, ...]

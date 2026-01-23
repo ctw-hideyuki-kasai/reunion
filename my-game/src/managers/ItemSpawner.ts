@@ -48,7 +48,7 @@ export class ItemSpawner {
 
   private itemTex(row: ItemCSV) {
     const id3 = String(row.Id).padStart(3, '0');
-    return `item-${id3}`;
+    return `/images/item/item${id3}.png`;
   }
 
   //< ランダムでレーン(縦軸)を選ぶ
@@ -69,7 +69,7 @@ export class ItemSpawner {
   }
 
   //< ランダムで横軸を選ぶ
-  private pickHorizontalY(_size: number) {
+  private pickHorizontalY(size: number) {
     const playTop = SCREEN.HEIGHT * BOTTOM_UI_RATIO * 0.5;
     const y0 = playTop;
     /*const y1 = y0 + 256;
@@ -78,7 +78,7 @@ export class ItemSpawner {
     return Phaser.Math.RND.pick([y0]);
   }
 
-  private spawnOne(row: ItemCSV, _scrollSpeedPxPerSec: number) {
+  private spawnOne(row: ItemCSV, scrollSpeedPxPerSec: number) {
     const tex = this.itemTex(row);
     let x = 0, y = 0, vx = 0, vy = 0;
     
@@ -101,6 +101,7 @@ export class ItemSpawner {
 
     const it = new Item(this.scene, x, y, tex);
     it.initFrom(row, row.SizeX, row.SizeY);
+    it.setDepth(1);
     this.scene.add.existing(it);
 
     // 速度を格納
